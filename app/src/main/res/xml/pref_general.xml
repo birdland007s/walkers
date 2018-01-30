@@ -1,0 +1,77 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="90000"
+        android:inputType="number"
+        android:key="Location_Update_Interval"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/pref_description_location_update_interval"
+        android:title="@string/pref_title_location_update_interval" />
+
+    <EditTextPreference
+        android:defaultValue="15"
+        android:inputType="number"
+        android:key="Location_Minimum_Distance"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/pref_description_location_minimum_distance"
+        android:title="@string/pref_title_location_minimum_distance" />
+
+    <EditTextPreference
+        android:defaultValue="20"
+        android:inputType="number"
+        android:key="Location_Reject_Accuracy"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/pref_description_location_rejected_accuracy"
+        android:title="@string/pref_title_location_rejected_accuracy" />
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="Location_low_accuracy_times"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/pref_description_continuous_times_low_accuracy"
+        android:title="@string/pref_title_continuous_times_low_accuracy" />
+
+    <EditTextPreference
+        android:defaultValue="600000"
+        android:inputType="number"
+        android:key="Location_Update_Interval_Low_Accuracy"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/pref_description_interval_in_low_accuracy"
+        android:title="@string/pref_title_interval_in_low_accuracy" />
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="Location_Stack_count"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:summary="@string/pref_description_stack_location_count"
+        android:title="@string/pref_title_stack_location_count" />
+
+    <!--<ListPreference-->
+        <!--android:defaultValue="-1"-->
+        <!--android:entries="@array/pref_example_list_titles"-->
+        <!--android:entryValues="@array/pref_example_list_values"-->
+        <!--android:key="example_list"-->
+        <!--android:negativeButtonText="@null"-->
+        <!--android:positiveButtonText="@null"-->
+        <!--android:title="@string/pref_title_add_friends_to_messages" />-->
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="Post_Status_Log"
+        android:summary="@string/pref_description_post_status_log"
+        android:title="@string/pref_title_post_status_log" />
+</PreferenceScreen>

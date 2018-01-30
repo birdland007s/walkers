@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">walkers</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_start_service_label">"Start Walking"</string>
+
+    <!-- Strings related to Settings -->
+    <string name="switch_on_text">"Location service is running..."</string>
+    <string name="no_location_detected">
+        No location detected. Make sure location is enabled on the device.
+    </string>
+
+    <string name="permission_rationale">Location permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core
+        functionality.</string>
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_location_update_interval">Location Update Interval in Millisecond</string>
+    <string name="pref_description_location_update_interval">The desired interval for location updates. Inexact. Updates may be more or less frequent.
+    </string>
+
+    <string name="pref_title_location_rejected_accuracy">"Rejected Accuracy value"</string>
+    <string name="pref_description_location_rejected_accuracy">"Minimum Radius accuracy value in meter to be rejected."</string>
+
+    <string name="pref_title_interval_in_low_accuracy">"Interval in low accuracy condition"</string>
+    <string name="pref_description_interval_in_low_accuracy">"Location update interval when low accuracy continues."</string>
+
+    <string name="pref_title_continuous_times_low_accuracy">"Times to switch low accuracy condition"</string>
+    <string name="pref_description_continuous_times_low_accuracy">"Continuous times to switch low accuracy condition."</string>
+
+    <string name="pref_title_stack_location_count">"Location Stack Count"</string>
+    <string name="pref_description_stack_location_count">"Stack count of location data in program."</string>
+
+    <string name="pref_title_post_status_log">"Post Status"</string>
+    <string name="pref_description_post_status_log">"Post status to web."</string>
+
+    <string name="pref_title_location_minimum_distance">"Minimum Distance"</string>
+    <string name="pref_description_location_minimum_distance">"Minimum distance in meter to be considered moved."</string>
+
+    <!--<string name="pref_title_add_friends_to_messages">Add friends to messages</string>-->
+    <!--<string-array name="pref_example_list_titles">-->
+        <!--<item>Always</item>-->
+        <!--<item>When possible</item>-->
+        <!--<item>Never</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="pref_example_list_values">-->
+        <!--<item>1</item>-->
+        <!--<item>0</item>-->
+        <!--<item>-1</item>-->
+    <!--</string-array>-->
+
+
+</resources>
