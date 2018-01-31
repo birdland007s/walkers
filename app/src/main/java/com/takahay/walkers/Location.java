@@ -41,7 +41,7 @@ public class Location extends AppCompatActivity {
 
 
         long interval = sValues.getLocationUpdateInterval();
-        float distance = sValues.getLocationMinimumDistance();
+        float distance = sValues.getLocationSmallestDisplacementForAPI();
 
         initializeLocationManager();
         try {

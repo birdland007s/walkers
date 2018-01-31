@@ -1,12 +1,17 @@
 package com.takahay.walkers;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import android.location.Location;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -46,6 +51,9 @@ public class WalkersService extends Service {
      */
     private LocationSettingsRequest mLocationSettingsRequest;
 
+
+    public static final String BROADCAST_ACTION = "com.takahay.walkers.updateprogress";
+    private static Intent intent_broadcast;
     /*
     *   Structure for Stock Data
     * */
@@ -106,8 +114,9 @@ public class WalkersService extends Service {
     private LocationCallBack callback = new LocationCallBack() {
 
         @Override
-        public void stackLocation(Location location, double MinimumDistance,
-                                  double RejectAccuracy, int Stackcount) {
+        public void stackLocation(Location location, double minimumDistance,
+                                  double rejectAccuracy, int stackNumber) {
+            String LogText;
             if (location != null) {
 
                 double lotAccuracy = RoundOffDouble( location.getAccuracy(), ACCURACY_DECIMAL_POINT );
@@ -117,10 +126,12 @@ public class WalkersService extends Service {
                         location.getLongitude(),
                         lotAccuracy));
 
-                if( lotAccuracy > RejectAccuracy )
+                if( lotAccuracy > rejectAccuracy )
                 {
-                    Log.i(TAG, String.format("Stack rejection, Accuracy is over limitation. = %f",
-                            RejectAccuracy));
+                    LogText = String.format("Stack rejection, Accuracy[%.2f] is over limitation[%.2f]. ",
+                            lotAccuracy, rejectAccuracy);
+                    Log.i(TAG, LogText);
+                    writeLastStatusToDisplay(LogText);
                     return;
                 }
 
@@ -138,10 +149,11 @@ public class WalkersService extends Service {
                     Log.i(TAG, String.format("Distance = %f", dist));
 
                     // check distances between prev and current locations.
-                    if( dist < MinimumDistance ) {
-
-                        Log.i(TAG, String.format("Location is constant. Distance is shorter than %f",
-                                MinimumDistance));
+                    if( dist < minimumDistance ) {
+                        LogText = String.format("Location is constant. Distance[%.2f] is shorter than minimum Distance[%.2f]",
+                                dist, minimumDistance);
+                        Log.i(TAG, LogText);
+                        writeLastStatusToDisplay(LogText);
                         return;
                     }
 
@@ -157,6 +169,15 @@ public class WalkersService extends Service {
 
                     // stack last location data.
                     LocationDataArray.add(mLastLocationData);
+
+                    LogText = String.format("Location[%.2f, %.2f] is stacked as index %d.\n" +
+                                    "Distance is %.2f and Accuracy is %.2f.",
+                            mLastLocationData.latitude,
+                            mLastLocationData.longitude,
+                            LocationDataArray.size()-1,
+                            mLastLocationData.distance,
+                            mLastLocationData.accuracy);
+                    writeLastStatusToDisplay(LogText);
                 }
             }
 
@@ -164,7 +185,7 @@ public class WalkersService extends Service {
             //Post locations to the web server, if the stack number is even to the limit.
             Log.i(TAG, String.format("LocationDataArrayCount=%d", stackSize ));
 
-            if( stackSize > Stackcount - 1 ) {
+            if( stackSize > stackNumber - 1 ) {
 
                 try {
                     //set Location data to Json and clear.
@@ -226,6 +247,10 @@ public class WalkersService extends Service {
         sharedValues sValues = (sharedValues)this.getApplication();
         sValues.SharedValueFromPreference();
 
+        //set
+        intent_broadcast = new Intent(BROADCAST_ACTION);
+        writeLastStatusToDisplay("start WalkerService...");
+
         Log.i(TAG, String.format("interval=%d distance=%f acc_limit=%f stackNum=%d",
                 sValues.getLocationUpdateInterval(),
                 sValues.getLocationMinimumDistance(),
@@ -270,4 +295,13 @@ public class WalkersService extends Service {
         new HttpResHelper().postStatusCode( 2, 1 );
     }
 
+    private void writeLastStatusToDisplay(String text)
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String buff = String.format("Date: %s \n%s", sdf.format(new Date()), text );
+        intent_broadcast.putExtra("LastStatus", buff);
+        sendBroadcast(intent_broadcast);
+
+
+    }
 }

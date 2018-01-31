@@ -60,10 +60,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
-//                Log.i( TAG, String.format("upddate Pref key=" + preference.getKey()
+//                Log.i( TAG, String.format("update Pref key=" + preference.getKey()
 //                                + ", value=" + value ));
-//
-//                preference.setSummary(stringValue);
+
+                preference.setSummary(stringValue);
 //                if( preference.getKey().compareTo("Location_Update_Interval") == 0 )
 //                {
 //                    sValues.setLocationUpdateInterval( Long.parseLong(stringValue) );

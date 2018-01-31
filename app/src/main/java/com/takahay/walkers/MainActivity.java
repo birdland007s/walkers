@@ -1,7 +1,10 @@
 package com.takahay.walkers;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -15,16 +18,27 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "walker.MainActivity";
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+    private sharedValues sValues = null;
+
+    // UI Widgets.
+    TextView ui_updateInterval;
+    TextView ui_smallestDsplacement;
+    TextView ui_minimumDistance;
+    TextView ui_minimumAccuracy;
+    TextView ui_StackNumber;
+    TextView ui_LastStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +49,10 @@ public class MainActivity extends AppCompatActivity {
 
         //initialize preferences
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        sValues = (sharedValues)this.getApplication();
+        sValues.SharedValueFromPreference();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+                FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,6 +60,26 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        //populate resources to ui.
+        ui_updateInterval = findViewById(R.id.text_updateInterval);
+        ui_smallestDsplacement = findViewById(R.id.text_smallestDisplacement);
+        ui_minimumDistance = findViewById(R.id.text_minimumDistance);
+        ui_minimumAccuracy = findViewById(R.id.text_minimumAccuracy);
+        ui_StackNumber = findViewById(R.id.text_StackNumber);
+        ui_LastStatus = findViewById(R.id.text_LastStatus);
+        ui_LastStatus.setText("");
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //Update Your UI here..
+                ui_LastStatus.setText(intent.getStringExtra("LastStatus"));
+            }
+        };
+        registerReceiver(broadcastReceiver, new IntentFilter(WalkersService.BROADCAST_ACTION));
+
+
 
         Switch switch_button = (Switch) findViewById(R.id.start_service_switch);
         switch_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -69,6 +105,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ui_updateInterval.setText(  Long.toString(sValues.getLocationUpdateInterval()) );
+        ui_smallestDsplacement.setText( Float.toString(sValues.getLocationSmallestDisplacementForAPI()) );
+        ui_minimumDistance.setText(  Float.toString(sValues.getLocationMinimumDistance()) );
+        ui_minimumAccuracy.setText(  Double.toString(sValues.getLocationRejectAccuracy()) );
+        ui_StackNumber.setText( Integer.toString(sValues.getLocationStackcount()));
 
     }
 

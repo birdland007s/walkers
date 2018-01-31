@@ -3,6 +3,9 @@ package com.takahay.walkers;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by takahay on 2018/01/29.
@@ -12,6 +15,7 @@ public class sharedValues extends Application {
 
     private long LocationUpdateInterval;
     private float LocationMinimumDistance;
+    private float LocationSmallestDisplacementForAPI;
     private double LocationRejectAccuracy;
     private int Locationlowaccuracytimes;
     private long LocationUpdateIntervalLowAccuracy;
@@ -39,10 +43,14 @@ public class sharedValues extends Application {
     {
         return LocationMinimumDistance;
     }
+    public void setLocationMinimumDistance(float value) { LocationMinimumDistance = value; }
 
-    public void setLocationMinimumDistance(float value)
-    {
-        LocationMinimumDistance = value;
+    //LocationSmallestDisplacementForAPI
+    public void setLocationSmallestDisplacementForAPI(float value) {
+        LocationSmallestDisplacementForAPI = value;
+    }
+    public float getLocationSmallestDisplacementForAPI() {
+        return LocationSmallestDisplacementForAPI;
     }
 
     //LocationRejectAccuracy
@@ -95,6 +103,7 @@ public class sharedValues extends Application {
         return PostStatusLog;
     }
 
+    //functions
     public void setPostStatusLog(boolean value)
     {
         PostStatusLog = value;
@@ -106,6 +115,7 @@ public class sharedValues extends Application {
         sharedValues sValues = this;
         sValues.setLocationUpdateInterval( Long.parseLong(SP.getString("Location_Update_Interval", "90000")) );
         sValues.setLocationMinimumDistance( Float.parseFloat(SP.getString("Location_Minimum_Distance", "15")) );
+        sValues.setLocationSmallestDisplacementForAPI( Float.parseFloat(SP.getString("Location_Smallest_Displacement", "10")) );
         sValues.setLocationRejectAccuracy( Float.parseFloat( SP.getString("Location_Reject_Accuracy", "20") ));
         sValues.setLocationlowaccuracytimes(Integer.parseInt(SP.getString("Location_low_accuracy_times", "5")));
         sValues.setLocationUpdateIntervalLowAccuracy(Long.parseLong(SP.getString("Location_Update_Interval_Low_Accuracy", "600000")));

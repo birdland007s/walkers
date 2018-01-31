@@ -138,16 +138,18 @@ public class googleLocation extends Activity{
                  */
                 Log.i(TAG, "onLocationResult");
 
-                //mCurrentLocation = locationResult.getLastLocation();
-                //Location lot = locationResult.getLastLocation();
-                //StackLocationCallback.stackLocation(lot);
-
-                for (Location lot : locationResult.getLocations()) {
-                    StackLocationCallback.stackLocation(lot,
+                Location lot = locationResult.getLastLocation();
+                StackLocationCallback.stackLocation(lot,
                             sValues.getLocationMinimumDistance(),
                             sValues.getLocationRejectAccuracy(),
                             sValues.getLocationStackcount());
-                }
+
+//                for (Location lot : locationResult.getLocations()) {
+//                    StackLocationCallback.stackLocation(lot,
+//                            sValues.getLocationMinimumDistance(),
+//                            sValues.getLocationRejectAccuracy(),
+//                            sValues.getLocationStackcount());
+//                }
             }
         };
     }
@@ -183,7 +185,7 @@ public class googleLocation extends Activity{
 
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        mLocationRequest.setSmallestDisplacement(sValues.getLocationMinimumDistance());
+        mLocationRequest.setSmallestDisplacement(sValues.getLocationSmallestDisplacementForAPI());
     }
 
     /**
