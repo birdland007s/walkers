@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -25,6 +26,8 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         //initialize preferences
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         sValues = (sharedValues)this.getApplication();
-        sValues.SharedValueFromPreference();
+        SharedValueFromPreference(sValues);
 
                 FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -79,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
         };
         registerReceiver(broadcastReceiver, new IntentFilter(WalkersService.BROADCAST_ACTION));
 
-
-
         Switch switch_button = (Switch) findViewById(R.id.start_service_switch);
         switch_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -92,7 +93,16 @@ public class MainActivity extends AppCompatActivity {
                         requestPermissions();
                     } else {
                         Log.i(TAG, "onCreate.Permission Granted");
-                        startService(new Intent(MainActivity.this, WalkersService.class));
+                        Intent intent = new Intent(MainActivity.this, WalkersService.class);
+                        Gson gson = new Gson();
+                        String json = gson.toJson(sValues.w, WalkerPref.class);
+                        Log.i(TAG, "json=" + json);
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("WalkerPref", json );
+                        intent.putExtras(bundle);
+                        Log.i(TAG, "onClick before calling service");
+                        startService(intent);
                     }
 
                 }
@@ -108,17 +118,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
 
-        ui_updateInterval.setText(  Long.toString(sValues.getLocationUpdateInterval()) );
-        ui_smallestDsplacement.setText( Float.toString(sValues.getLocationSmallestDisplacementForAPI()) );
-        ui_minimumDistance.setText(  Float.toString(sValues.getLocationMinimumDistance()) );
-        ui_minimumAccuracy.setText(  Double.toString(sValues.getLocationRejectAccuracy()) );
-        ui_StackNumber.setText( Integer.toString(sValues.getLocationStackcount()));
+        ui_updateInterval.setText(  Long.toString(sValues.w.LocationUpdateInterval) );
+        ui_smallestDsplacement.setText( Float.toString(sValues.w.LocationSmallestDisplacementForAPI) );
+        ui_minimumDistance.setText(  Float.toString(sValues.w.LocationMinimumDistance) );
+        ui_minimumAccuracy.setText(  Double.toString(sValues.w.LocationRejectAccuracy) );
+        ui_StackNumber.setText( Integer.toString(sValues.w.LocationStackcount));
 
     }
 
@@ -262,6 +270,19 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         }
+    }
+
+    void SharedValueFromPreference(sharedValues sValues)
+    {
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(this);
+        sValues.w.LocationUpdateInterval = Long.parseLong(SP.getString("Location_Update_Interval", "90000")) ;
+        sValues.w.LocationMinimumDistance = Float.parseFloat(SP.getString("Location_Minimum_Distance", "15")) ;
+        sValues.w.LocationSmallestDisplacementForAPI = Float.parseFloat(SP.getString("Location_Smallest_Displacement", "10")) ;
+        sValues.w.LocationRejectAccuracy = Float.parseFloat( SP.getString("Location_Reject_Accuracy", "20") );
+        sValues.w.Locationlowaccuracytimes = Integer.parseInt(SP.getString("Location_low_accuracy_times", "5"));
+        sValues.w.LocationUpdateIntervalLowAccuracy = Long.parseLong(SP.getString("Location_Update_Interval_Low_Accuracy", "600000"));
+        sValues.w.LocationStackcount = Integer.parseInt(SP.getString("Location_Stack_count", "5"));
+        sValues.w.PostStatusLog = SP.getBoolean("Post_Status_Log", true);
     }
 
 }

@@ -3,7 +3,9 @@ package com.takahay.walkers;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -121,7 +124,7 @@ public class WalkersService extends Service {
 
                 double lotAccuracy = RoundOffDouble( location.getAccuracy(), ACCURACY_DECIMAL_POINT );
 
-                Log.i(TAG, String.format("Location = [%.2f, %.2f], accuracy = %f",
+                Log.i(TAG, String.format("Location = [%.6f, %.6f], accuracy = %f",
                         location.getLatitude(),
                         location.getLongitude(),
                         lotAccuracy));
@@ -150,7 +153,7 @@ public class WalkersService extends Service {
 
                     // check distances between prev and current locations.
                     if( dist < minimumDistance ) {
-                        LogText = String.format("Location is constant. Distance[%.2f] is shorter than minimum Distance[%.2f]",
+                        LogText = String.format("Location is constant. Distance[%.4f] is shorter than minimum Distance[%.2f]",
                                 dist, minimumDistance);
                         Log.i(TAG, LogText);
                         writeLastStatusToDisplay(LogText);
@@ -160,6 +163,7 @@ public class WalkersService extends Service {
                     // update the previous location's time duration.
                     double d = (double)( current.getTime() - mLastLocationData.time.getTime())
                             / (double)java.util.concurrent.TimeUnit.MINUTES.toMillis(1);
+
                     mLastLocationData.duration = RoundOffDouble( d, DURATION_DECIMAL_POINT );
 
                     Log.i(TAG, String.format("Duration = %f", d));
@@ -170,7 +174,7 @@ public class WalkersService extends Service {
                     // stack last location data.
                     LocationDataArray.add(mLastLocationData);
 
-                    LogText = String.format("Location[%.2f, %.2f] is stacked as index %d.\n" +
+                    LogText = String.format("Location[%.6f, %.6f] is stacked as index %d.\n" +
                                     "Distance is %.2f and Accuracy is %.2f.",
                             mLastLocationData.latitude,
                             mLastLocationData.longitude,
@@ -244,18 +248,27 @@ public class WalkersService extends Service {
 
         //initialize valiables
         mLastLocationData = null;
-        sharedValues sValues = (sharedValues)this.getApplication();
-        sValues.SharedValueFromPreference();
+//        sharedValues sValues = (sharedValues)this.getApplication();
+//        sValues.SharedValueFromPreference(this);
+
+        Bundle bundle = intent.getExtras();
+
+        String json = bundle.getString("WalkerPref");
+        Log.i(TAG, "json="+json);
+        Gson gson = new Gson();
+        WalkerPref sValues = gson.fromJson(json, WalkerPref.class);
 
         //set
         intent_broadcast = new Intent(BROADCAST_ACTION);
         writeLastStatusToDisplay("start WalkerService...");
 
-        Log.i(TAG, String.format("interval=%d distance=%f acc_limit=%f stackNum=%d",
-                sValues.getLocationUpdateInterval(),
-                sValues.getLocationMinimumDistance(),
-                sValues.getLocationRejectAccuracy(),
-                sValues.getLocationStackcount()));
+        String buff = String.format("interval=%d distance=%f acc_limit=%f stackNum=%d",
+                sValues.LocationUpdateInterval,
+                sValues.LocationMinimumDistance,
+                sValues.LocationRejectAccuracy,
+                sValues.LocationStackcount);
+
+        Log.i(TAG, buff);
 
         int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getApplicationContext());
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -264,6 +277,8 @@ public class WalkersService extends Service {
             com.takahay.walkers.Location walkerLocation =
                     new com.takahay.walkers.Location( getApplicationContext(), sValues, callback );
             status = walkerLocation.startLocationUpdates();
+
+            writeLastStatusToDisplay( "start Location status: " + status + "\nParams: " + buff );
         }
         else
         {
@@ -273,7 +288,7 @@ public class WalkersService extends Service {
                     new com.takahay.walkers.googleLocation( getApplicationContext(), sValues, callback );
 
             status = googleLocation.createRequest();
-
+            writeLastStatusToDisplay( "start googleLocation status: " + status + "\nParams: " + buff );
         }
 
         new HttpResHelper().postStatusCode( 1, (status) ? 1 : 0 );

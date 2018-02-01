@@ -29,7 +29,7 @@ public class googleLocation extends Activity{
 
     private static final String TAG = "walkers.googleLocation";
 
-    private sharedValues sValues;
+    private WalkerPref sValues;
     /**
      * Provides access to the Fused Location Provider API.
      */
@@ -63,7 +63,7 @@ public class googleLocation extends Activity{
     /**
      *      Constructor
      */
-    public googleLocation(  Context context, sharedValues sv, LocationCallBack callback)
+    public googleLocation(  Context context, WalkerPref sv, LocationCallBack callback)
     {
         Log.i(TAG, "googleLocation");
 
@@ -125,13 +125,14 @@ public class googleLocation extends Activity{
      * Creates a callback for receiving location events.
      */
     private void createLocationCallback() {
-        Log.i(TAG, "createLocationCallback");
+        Log.i(TAG, "createLocationCallback start");
 
 
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
+
 
                 /**
                  *  call location stack func here.
@@ -140,9 +141,9 @@ public class googleLocation extends Activity{
 
                 Location lot = locationResult.getLastLocation();
                 StackLocationCallback.stackLocation(lot,
-                            sValues.getLocationMinimumDistance(),
-                            sValues.getLocationRejectAccuracy(),
-                            sValues.getLocationStackcount());
+                            sValues.LocationMinimumDistance,
+                            sValues.LocationRejectAccuracy,
+                            sValues.LocationStackcount);
 
 //                for (Location lot : locationResult.getLocations()) {
 //                    StackLocationCallback.stackLocation(lot,
@@ -152,6 +153,8 @@ public class googleLocation extends Activity{
 //                }
             }
         };
+
+        Log.i(TAG, "createLocationCallback finish");
     }
 
     /**
@@ -168,7 +171,13 @@ public class googleLocation extends Activity{
      * updates.
      */
     private void createLocationRequest() {
-        Log.i(TAG, "createLocationRequest");
+
+        Log.i(TAG, "createLocationRequest start");
+
+        Log.i(TAG, String.format("createLocationRequest " +
+                        "interval=%d smallestDisplacement=%f",
+                sValues.LocationUpdateInterval,
+                sValues.LocationSmallestDisplacementForAPI));
 
         mLocationRequest = new LocationRequest();
 
@@ -176,7 +185,7 @@ public class googleLocation extends Activity{
         // inexact. You may not receive updates at all if no location sources are available, or
         // you may receive them slower than requested. You may also receive updates faster than
         // requested if other applications are requesting location at a faster interval.
-        long interval = sValues.getLocationUpdateInterval();
+        long interval = sValues.LocationUpdateInterval;
         mLocationRequest.setInterval(interval);
 
         // Sets the fastest rate for active location updates. This interval is exact, and your
@@ -185,7 +194,9 @@ public class googleLocation extends Activity{
 
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        mLocationRequest.setSmallestDisplacement(sValues.getLocationSmallestDisplacementForAPI());
+        mLocationRequest.setSmallestDisplacement(sValues.LocationSmallestDisplacementForAPI);
+
+        Log.i(TAG, "createLocationRequest finish");
     }
 
     /**

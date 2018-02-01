@@ -15,7 +15,7 @@ import com.google.android.gms.location.LocationRequest;
 public class Location extends AppCompatActivity {
 
     private static final String TAG = "walkers.Location";
-    private sharedValues sValues;
+    private WalkerPref sValues;
     private LocationManager mLocationManager = null;
 
     private LocationCallBack locationCallback;
@@ -24,7 +24,7 @@ public class Location extends AppCompatActivity {
     /**
      *      Constructor
      */
-    public Location(  Context context, sharedValues sv, LocationCallBack callback)
+    public Location(  Context context, WalkerPref sv, LocationCallBack callback)
     {
         mContext = context;
         locationCallback = callback;
@@ -40,8 +40,8 @@ public class Location extends AppCompatActivity {
         Log.e(TAG, "startLocationUpdates start");
 
 
-        long interval = sValues.getLocationUpdateInterval();
-        float distance = sValues.getLocationSmallestDisplacementForAPI();
+        long interval = sValues.LocationUpdateInterval;
+        float distance = sValues.LocationSmallestDisplacementForAPI;
 
         initializeLocationManager();
         try {
@@ -90,9 +90,9 @@ public class Location extends AppCompatActivity {
             Log.i(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
             locationCallback.stackLocation(location,
-                    sValues.getLocationMinimumDistance(),
-                    sValues.getLocationRejectAccuracy(),
-                    sValues.getLocationStackcount());
+                    sValues.LocationMinimumDistance,
+                    sValues.LocationRejectAccuracy,
+                    sValues.LocationStackcount);
         }
         @Override
         public void onProviderDisabled(String provider)
